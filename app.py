@@ -1,15 +1,17 @@
-from ultralytics import YOLO
+from flask import Flask, request, jsonify
+from flask_cors import CORS  # Import CORS
+import numpy as np
 import cv2
 import math
 import requests
 import json
-import pygame
 import time
-from flask import Flask, request, jsonify
-import numpy as np
 
 # Initialize Flask app
 app = Flask(__name__)
+
+# Apply CORS to the app
+CORS(app)  # This will enable CORS for all routes
 
 # Load model
 model = YOLO("best.pt")
@@ -75,7 +77,6 @@ def sendMessage(confidence, class_name, alert_message):
     else:
         print(f"Failed to send message: {response.status_code} {response.text}")
 
-
 @app.route('/process-image', methods=['POST'])
 def process_image():
     if 'image' not in request.files:
@@ -120,7 +121,6 @@ def process_image():
             })
 
     return jsonify({"detections": response_data})
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
