@@ -4,3 +4,4 @@ ultralytics
 pygame
 opencv-python-headless
 numpy
+flask-cors
