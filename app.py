@@ -1,3 +1,4 @@
+from ultralytics import YOLO
 from flask import Flask, request, jsonify
 from flask_cors import CORS  # Import CORS
 import numpy as np
