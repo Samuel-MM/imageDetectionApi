@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Webcam Capture</title>
+    <style>
+        #webcam {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+        }
+        #captured {
+            border: 1px solid black;
+            display: block;
+            margin: 0 auto;
+            margin-top: 20px;
+            display: none; /* Initially hide the captured image */
+        }
+        #result {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+<body>
+    <h1>Webcam Capture</h1>
+    <video id="webcam" width="640" height="480" autoplay></video>
+    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
+    <img id="captured" width="640" height="480" />
+    <div id="result"></div>
+    <script>
+        const webcam = document.getElementById('webcam');
+        const canvas = document.getElementById('canvas');
+        const capturedImage = document.getElementById('captured');
+        const resultDiv = document.getElementById('result');
+        const context = canvas.getContext('2d');
+        const captureInterval = 1000;
+
+        async function startWebcam() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+                webcam.srcObject = stream;
+            } catch (err) {
+                console.error('Error accessing webcam: ', err);
+            }
+        }
+
+        function captureImage() {
+            context.drawImage(webcam, 0, 0, canvas.width, canvas.height);
+            const imageData = canvas.toDataURL('image/jpeg');
+            sendImageToServer(imageData);
+        }
+
+        function sendImageToServer(imageData) {
+            const formData = new FormData();
+            formData.append('image', dataURLtoFile(imageData, 'captured-image.jpeg'));
+
+            fetch('http://20.206.206.105/process-image', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Server response:', data);
+                if (data.detections && data.detections.length > 0) {
+                    const detection = data.detections[0];
+                    resultDiv.textContent = `Detected: ${detection.class_name} (Confidence: ${detection.confidence}%)`;
+                    // Show the captured image
+                    capturedImage.src = imageData;
+                    capturedImage.style.display = 'block'; // Display the image
+                } else {
+                    resultDiv.textContent = 'No detection found.';
+                    capturedImage.style.display = 'none'; // Hide the image if no detection
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                resultDiv.textContent = 'Error sending image to server.';
+                capturedImage.style.display = 'none'; // Hide the image on error
+            });
+        }
+
+        function dataURLtoFile(dataURL, filename) {
+            const [header, data] = dataURL.split(',');
+            const mime = header.match(/:(.*?);/)[1];
+            const binary = atob(data);
+            const array = [];
+            for (let i = 0; i < binary.length; i++) {
+                array.push(binary.charCodeAt(i));
+            }
+            return new File([new Uint8Array(array)], filename, { type: mime });
+        }
+
+        startWebcam();
+        setInterval(captureImage, captureInterval);
+    </script>
+</body>
+</html>
