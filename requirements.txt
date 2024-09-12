@@ -1,0 +1,6 @@
+Flask==2.3.3
+requests
+ultralytics
+pygame
+opencv-python-headless
+numpy
