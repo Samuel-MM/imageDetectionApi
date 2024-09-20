@@ -57,7 +57,7 @@
             const formData = new FormData();
             formData.append('image', dataURLtoFile(imageData, 'captured-image.jpeg'));
 
-            fetch('http://20.206.206.105/process-image', {
+            fetch('http://172.206.2.48/process-image', {
                 method: 'POST',
                 body: formData
             })
