@@ -8,6 +8,25 @@ import requests
 import json
 import time
 
+from twilio.rest import Client
+
+# Configurações da Twilio (substitua pelos seus dados)
+account_sid = 'AC0e12153a507476143705f86c584d80bf'  # Seu Account SID
+auth_token = 'c15a99b9294c9239a0980419fcc8f360'     # Seu Auth Token
+twilio_client = Client(account_sid, auth_token)
+
+def send_fall_alert_sms():
+    try:
+        message = twilio_client.messages.create(
+            body='Alerta! Uma pessoa foi detectada em queda.',
+            from_='+12082719662',  # Número de telefone Twilio
+            to='+5535987036620'     # Número de telefone que vai receber o SMS
+        )
+        print(f"Mensagem enviada: {message.sid}")
+    except Exception as e:
+        print(f"Erro ao enviar SMS: {str(e)}")
+
+
 # Initialize Flask app
 app = Flask(__name__)
 
@@ -113,6 +132,7 @@ def process_image():
                 if current_time - last_alert_time["person-fall"] >= alert_interval:
                     alert_message = f"Alert: {class_name} detected with high confidence!"
                     # sendMessage(confidence, class_name, alert_message)
+                    send_fall_alert_sms()  # Envia o SMS
                     last_alert_time[class_name] = current_time
 
             response_data.append({
