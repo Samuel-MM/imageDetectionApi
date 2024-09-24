@@ -7,12 +7,15 @@ import math
 import requests
 import json
 import time
+from dotenv import load_dotenv
 
 from twilio.rest import Client
 
+load_dotenv()
+
 # Configurações da Twilio (substitua pelos seus dados)
-account_sid = 'AC0e12153a507476143705f86c584d80bf'  # Seu Account SID
-auth_token = 'c15a99b9294c9239a0980419fcc8f360'     # Seu Auth Token
+account_sid = os.getenv('ACCOUNT_SID')  # Seu Account SID
+auth_token = os.getenv('AUTH_TOKEN')     # Seu Auth Token
 twilio_client = Client(account_sid, auth_token)
 
 def send_fall_alert_sms():
