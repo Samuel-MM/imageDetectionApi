@@ -9,7 +9,6 @@ import json
 import time
 from dotenv import load_dotenv
 import os
-
 from twilio.rest import Client
 
 load_dotenv()
@@ -132,11 +131,11 @@ def process_image():
                     # sendMessage(confidence, class_name, alert_message)
                     last_alert_time[class_name] = current_time
 
-            if class_name == "person-fall" and confidence > 0.75:
+            if class_name == "person-fall" and confidence > 0.65:
                 if current_time - last_alert_time["person-fall"] >= alert_interval:
                     alert_message = f"Alert: {class_name} detected with high confidence!"
                     # sendMessage(confidence, class_name, alert_message)
-                    send_fall_alert_sms()  # Envia o SMS
+#                    send_fall_alert_sms()  # Envia o SMS
                     last_alert_time[class_name] = current_time
 
             response_data.append({

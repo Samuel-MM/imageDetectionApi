@@ -34,32 +34,33 @@ function sendImageToServer(imageData, canvas, context, resultDiv, alertAudio) {
             console.log('Server response:', data);
             if (data.detections && data.detections.length > 0) {
                 const detection = data.detections[0];
+                let classExhibition;
                 switch (detection.class_name) {
                     case 'person-in-bed':
                         document.querySelector("#canvas").style.border = '1px solid black';
-                        detection.class_name = 'Indivíduo no leito';
+                        classExhibition = 'Indivíduo no leito';
                         break;
                     case 'person-fall':
                         document.querySelector("#canvas").style.border = '1px solid red';
-                        detection.class_name = 'Queda';
+                        classExhibition = 'Queda';
                         break;
                     case 'person-near-fall':
                         document.querySelector("#canvas").style.border = '1px solid black';
-                        detection.class_name = 'Risco de queda';
+                        classExhibition = 'Risco de queda';
                         break;
                     case 'person-moving-out':
                         document.querySelector("#canvas").style.border = '1px solid black';
-                        detection.class_name = 'Indivíduo movendo para fora do leito';
+                        classExhibition = 'Indivíduo movendo para fora do leito';
                         break;
                     case 'person-out':
                         document.querySelector("#canvas").style.border = '1px solid black';
-                        detection.class_name = 'Indivíduo fora do leito';
+                        classExhibition = 'Indivíduo fora do leito';
                         break;
                     default:
                         document.querySelector("#canvas").style.border = '1px solid black';
                         console.warn("Classe não encontrada, aplicando cor preta");
                 }            
-                resultDiv.textContent = `Detectado: ${detection.class_name} - (Confiança: ${(detection.confidence * 100).toFixed(0)}%)`;
+                resultDiv.textContent = `Detectado: ${classExhibition} - (Confiança: ${(detection.confidence * 100).toFixed(0)}%)`;
 
                 let currentAudio = null; // variável para armazenar o áudio que está tocando
 
@@ -75,15 +76,15 @@ function sendImageToServer(imageData, canvas, context, resultDiv, alertAudio) {
                     audio.play();
                     currentAudio = audio; // Atualiza o áudio atual
                 }
-                if (detection.class_name.toLowerCase() === 'person-moving-out') {
 
+                if (detection.class_name.toLowerCase() === 'person-near-fall') {
                     playAlertAudio(alertAudio);
 
                 }
 
-                if (detection.class_name.toLowerCase() === 'person-fall') {
-                    playAlertAudio(alertAudio1);
-                }
+                // if (detection.class_name.toLowerCase() === 'person-fall') {
+                //     playAlertAudio(alertAudio1);
+                // }
 
                 drawRectangle(detection, canvas, context);
             } else {
