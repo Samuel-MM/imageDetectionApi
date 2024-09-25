@@ -6,4 +6,4 @@ opencv-python-headless
 numpy
 flask-cors
 twilio
-dotenv
+python-dotenv
