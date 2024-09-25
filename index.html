@@ -1,100 +1,264 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Webcam Capture</title>
+    <title>Sistema de Monitoramento Antiquedas</title>
     <style>
-        #webcam {
-            border: 1px solid black;
-            display: block;
-            margin: 0 auto;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        #captured {
-            border: 1px solid black;
-            display: block;
-            margin: 0 auto;
-            margin-top: 20px;
-            display: none; /* Initially hide the captured image */
+
+        body {
+            font-family: Arial, sans-serif;
         }
-        #result {
+
+        /* Contêiner geral */
+        .container-all {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            height: 100vh;
+            background: linear-gradient(to bottom, #1f3a5b, #2e7d9e);
+        }
+
+        /* Título */
+        h2 {
             text-align: center;
-            margin-top: 20px;
-            font-size: 1.2em;
+            color: white;
+            margin-bottom: 20px;
+        }
+
+        /* Contêiner para os blocos de webcam e imagem estática */
+        .container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 40px;
+            /* Espaço entre os blocos */
+            width: 100%;
+            margin-bottom: 20px;
+        }
+
+        /* Bloco da webcam e imagem estática */
+        .canvas-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Estilo do canvas da webcam */
+        #canvas {
+
+
+            border: 2px solid black;
+        }
+
+        /* Estilo da imagem estática */
+        #staticImage {
+            /*width: 640px; /* Ajustado para compactar */
+            /*height: 3600px;*/
+
+            border: 2px solid black;
+        }
+
+        /* Estilo dos textos de detecção */
+        #result,
+        #result2 {
+            margin-top: 5px;
+            color: white;
+            font-size: 1.1em;
+            text-align: center;
+        }
+
+        /* Contêiner geral das informações */
+        .info-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        /* Blocos de informação do paciente */
+        .info-box {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: #2e7d9e;
+            border-radius: 8px;
+            width: 290px;
+            /* Reduzido para ajustar */
+            padding: 5px;
+            color: white;
+            flex-wrap: wrap;
+            margin: auto;
+            /* Adicionado para espaçamento entre os blocos */
+        }
+
+        .info-box .data-item {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            /* Reduzido */
+            padding: 4px 8px;
+            border-radius: 8px;
+        }
+
+        .info-box .data-item img {
+            width: 18px;
+            /* Reduzido */
+            height: 18px;
+            /* Reduzido */
+            margin-right: 5px;
+            /* Reduzido */
+        }
+
+        .info-box .name {
+            background-color: #4caf50;
+        }
+
+        .info-box .ecg {
+            background-color: #ffc107;
+        }
+
+        .info-box .spo2 {
+            background-color: #03a9f4;
+        }
+
+        .info-box .temp {
+            background-color: #ff5722;
+        }
+
+        /* Centralização das duas linhas */
+        .info-row {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            /* Ajustado */
+            margin-bottom: 10px;
         }
     </style>
 </head>
+
 <body>
-    <h1>Webcam Capture</h1>
-    <video id="webcam" width="640" height="480" autoplay></video>
-    <canvas id="canvas" width="640" height="480" style="display: none;"></canvas>
-    <img id="captured" width="640" height="480" />
-    <div id="result"></div>
+    <script src="functions.js"></script>
+
+    <div class="container-all">
+        <div style="margin: auto;">
+            <!-- Título -->
+            <h2>Sistema de Monitoramento de Quedas</h2>
+
+            <!-- Contêiner para webcam e imagem estática -->
+            <div class="container">
+                <div>
+                    <!-- Webcam -->
+                    <div class="canvas-container">
+                        <canvas id="canvas" width="640" height="360"></canvas>
+                        <div id="result">Waiting for detection...</div>
+                    </div>
+                    <!-- Informações do Robson Freire -->
+                    <div class="info-box" style="margin-top: 20px;">
+                        <div class="data-item name">
+                            <img src="user-icon.png" alt="User">
+                            <span>Robson Freire</span>
+                        </div>
+                        <div class="data-item ecg">
+                            <img src="heartbeat-icon.png" alt="ECG">
+                            <span>ECG: 83bpm</span>
+                        </div>
+                        <!-- SpO2 do Robson Freire -->
+                        <div class="info-box">
+                            <div class="data-item spo2">
+                                <img src="spo2-icon.png" alt="SpO2">
+                                <span>SpO2: 96</span>
+                            </div>
+                            <div class="data-item temp">
+                                <img src="temperature-icon.png" alt="Temp">
+                                <span>Temp: 36.5°C</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- Imagem estática -->
+                <div>
+                    <div class="canvas-container">
+                        <img id="staticImage" src="static-image.jpg" width="640" height="365" alt="Imagem Estática">
+                        <div id="result2">Não há paciente...</div>
+                    </div>
+                    <!-- Informações do Roberto Pinheiro -->
+                    <div class="info-box" style="margin-top: 20px;">
+                        <div class="data-item name">
+                            <img src="user-icon.png" alt="User">
+                            <span>Roberto Pinheiro</span>
+                        </div>
+                        <div class="data-item ecg">
+                            <img src="heartbeat-icon.png" alt="ECG">
+                            <span>ECG: 78bpm</span>
+                        </div>
+                        <!-- SpO2 do Roberto Pinheiro -->
+                        <div class="info-box">
+                            <div class="data-item spo2">
+                                <img src="spo2-icon.png" alt="SpO2">
+                                <span>SpO2: 95</span>
+                            </div>
+                            <div class="data-item temp">
+                                <img src="temperature-icon.png" alt="Temp">
+                                <span>Temp: 35.9°C</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contêiner geral para as informações dos pacientes -->
+            <div class="info-wrapper">
+                <!-- Primeira linha de informações -->
+                <div class="info-row">
+
+
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Adicionando o elemento de áudio -->
+    <audio id="alert-audio">
+        <source src="AUDIO_TESTE.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Adicionando o elemento de áudio -->
+    <audio id="alert-audio1">
+        <source src="Caido.mp3" type="audio/mpeg">
+    </audio>
+
     <script>
-        const webcam = document.getElementById('webcam');
         const canvas = document.getElementById('canvas');
-        const capturedImage = document.getElementById('captured');
-        const resultDiv = document.getElementById('result');
         const context = canvas.getContext('2d');
+        const resultDiv = document.getElementById('result');
+        const alertAudio = document.getElementById('alert-audio');
         const captureInterval = 1000;
 
-        async function startWebcam() {
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({ video: true });
-                webcam.srcObject = stream;
-            } catch (err) {
-                console.error('Error accessing webcam: ', err);
-            }
-        }
-
-        function captureImage() {
-            context.drawImage(webcam, 0, 0, canvas.width, canvas.height);
-            const imageData = canvas.toDataURL('image/jpeg');
-            sendImageToServer(imageData);
-        }
-
-        function sendImageToServer(imageData) {
-            const formData = new FormData();
-            formData.append('image', dataURLtoFile(imageData, 'captured-image.jpeg'));
-
-            fetch('http://172.206.2.48/process-image', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                console.log('Server response:', data);
-                if (data.detections && data.detections.length > 0) {
-                    const detection = data.detections[0];
-                    resultDiv.textContent = `Detected: ${detection.class_name} (Confidence: ${detection.confidence}%)`;
-                    // Show the captured image
-                    capturedImage.src = imageData;
-                    capturedImage.style.display = 'block'; // Display the image
-                } else {
-                    resultDiv.textContent = 'No detection found.';
-                    capturedImage.style.display = 'none'; // Hide the image if no detection
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                resultDiv.textContent = 'Error sending image to server.';
-                capturedImage.style.display = 'none'; // Hide the image on error
-            });
-        }
-
-        function dataURLtoFile(dataURL, filename) {
-            const [header, data] = dataURL.split(',');
-            const mime = header.match(/:(.*?);/)[1];
-            const binary = atob(data);
-            const array = [];
-            for (let i = 0; i < binary.length; i++) {
-                array.push(binary.charCodeAt(i));
-            }
-            return new File([new Uint8Array(array)], filename, { type: mime });
-        }
-
-        startWebcam();
-        setInterval(captureImage, captureInterval);
+        startWebcam(canvas, context, resultDiv, alertAudio, captureInterval);
     </script>
+
+    <script>
+        const canvas1 = document.getElementById('canvas');
+        const context1 = canvas.getContext('2d');
+        const resultDiv1 = document.getElementById('result');
+        const alertAudio1 = document.getElementById('alert-audio1');
+        const captureInterval1 = 1000;
+
+        startWebcam(canvas, context, resultDiv, alertAudio, captureInterval);
+    </script>
+    </div>
 </body>
+
 </html>
